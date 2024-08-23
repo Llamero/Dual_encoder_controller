@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>C:\Users\Ben\Documents\GitHub\Dual_encoder_controller\KiCAD\Dual encoder controller.kicad_sch</source>
+    <date>8/21/2024 2:56:49 PM</date>
+    <tool>Eeschema 7.0.1</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>Dual encoder controller.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="C1">
+      <value>C_Small</value>
+      <footprint>Capacitor_THT:C_Rect_L4.0mm_W2.5mm_P2.50mm</footprint>
+      <datasheet>https://search.murata.co.jp/Ceramy/image/img/A01X/G101/ENG/RCE_X7R_X7S_25V-100V_E.pdf</datasheet>
+      <fields>
+        <field name="Manufacturer">Murata Electronics</field>
+        <field name="Part">RCER71H105K2DBH03A</field>
+      </fields>
+      <libsource lib="Device" part="C_Small" description="Unpolarized capacitor, small symbol"/>
+      <property name="Manufacturer" value="Murata Electronics"/>
+      <property name="Part" value="RCER71H105K2DBH03A"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Dual encoder controller.kicad_sch"/>
+      <property name="ki_description" value="Unpolarized capacitor, small symbol"/>
+      <property name="ki_keywords" value="capacitor cap"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>86e2077b-82dc-4b1f-9854-2bdab4196cba</tstamps>
+    </comp>
+    <comp ref="EN1">
+      <value>EM14 Encoder</value>
+      <footprint>Custom footprints:EM14R0B-M25-L064S</footprint>
+      <datasheet>https://www.bourns.com/docs/Product-Datasheets/em14.pdf</datasheet>
+      <fields>
+        <field name="Manufacturer">Bourns Inc.</field>
+        <field name="Part">EM14R0B-M25-L064S</field>
+      </fields>
+      <libsource lib="Custom" part="EM14_Encoder" description=""/>
+      <property name="Manufacturer" value="Bourns Inc."/>
+      <property name="Part" value="EM14R0B-M25-L064S"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Dual encoder controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>789e23c5-cf6f-4aec-b1c9-bfafb4405843</tstamps>
+    </comp>
+    <comp ref="J1">
+      <value>8P8C_Shielded</value>
+      <footprint>Custom footprints:ASSMANN_A-2004-2-4-LPS-N-R</footprint>
+      <datasheet>https://www.assmann-wsw.com/uploads/datasheets/ASS_7323_CO.PDF</datasheet>
+      <fields>
+        <field name="Manufacturer">Assmann WSW Components</field>
+        <field name="Part">A-2004-2-4-LPS-N-R</field>
+      </fields>
+      <libsource lib="Connector" part="8P8C_Shielded" description="RJ connector, 8P8C (8 positions 8 connected), RJ31/RJ32/RJ33/RJ34/RJ35/RJ41/RJ45/RJ49/RJ61, Shielded"/>
+      <property name="Manufacturer" value="Assmann WSW Components"/>
+      <property name="Part" value="A-2004-2-4-LPS-N-R"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Dual encoder controller.kicad_sch"/>
+      <property name="ki_description" value="RJ connector, 8P8C (8 positions 8 connected), RJ31/RJ32/RJ33/RJ34/RJ35/RJ41/RJ45/RJ49/RJ61, Shielded"/>
+      <property name="ki_keywords" value="8P8C RJ socket connector"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>05b6c302-df22-4146-8579-aaa65db79906</tstamps>
+    </comp>
+    <comp ref="J2">
+      <value>8P8C_Shielded</value>
+      <footprint>Custom footprints:ASSMANN_A-2004-2-4-LPS-N-R</footprint>
+      <datasheet>https://www.assmann-wsw.com/uploads/datasheets/ASS_7323_CO.PDF</datasheet>
+      <fields>
+        <field name="Manufacturer">Assmann WSW Components</field>
+        <field name="Part">A-2004-2-4-LPS-N-R</field>
+      </fields>
+      <libsource lib="Connector" part="8P8C_Shielded" description="RJ connector, 8P8C (8 positions 8 connected), RJ31/RJ32/RJ33/RJ34/RJ35/RJ41/RJ45/RJ49/RJ61, Shielded"/>
+      <property name="Manufacturer" value="Assmann WSW Components"/>
+      <property name="Part" value="A-2004-2-4-LPS-N-R"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Dual encoder controller.kicad_sch"/>
+      <property name="ki_description" value="RJ connector, 8P8C (8 positions 8 connected), RJ31/RJ32/RJ33/RJ34/RJ35/RJ41/RJ45/RJ49/RJ61, Shielded"/>
+      <property name="ki_keywords" value="8P8C RJ socket connector"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>cf40fd51-7877-448a-8615-4c9fffded045</tstamps>
+    </comp>
+    <comp ref="J4">
+      <value>2.5x5.5 Barrel Jack</value>
+      <footprint>Custom footprints:TENSILITY_54-00128-DC Jack</footprint>
+      <datasheet>http://tensility.com/pdffiles/54-00128.pdf</datasheet>
+      <fields>
+        <field name="Manufacturer">Tensility International Corp</field>
+        <field name="Part">54-00128</field>
+      </fields>
+      <libsource lib="Connector" part="Barrel_Jack_Switch_MountingPin" description="DC Barrel Jack with an internal switch and a mounting pin"/>
+      <property name="Manufacturer" value="Tensility International Corp"/>
+      <property name="Part" value="54-00128"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Dual encoder controller.kicad_sch"/>
+      <property name="ki_description" value="DC Barrel Jack with an internal switch and a mounting pin"/>
+      <property name="ki_keywords" value="DC power barrel jack connector"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>44df79ef-4207-4cad-980e-583c54b9299e</tstamps>
+    </comp>
+    <comp ref="R1">
+      <value>150</value>
+      <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal</footprint>
+      <datasheet>https://www.te.com/usa-en/product-1622321-1.datasheet.pdf</datasheet>
+      <fields>
+        <field name="Manufacturer">TE Connectivity Passive Product</field>
+        <field name="Part">LR1F150R</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Manufacturer" value="TE Connectivity Passive Product"/>
+      <property name="Part" value="LR1F150R"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Dual encoder controller.kicad_sch"/>
+      <property name="ki_description" value="Resistor"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>4a290aa8-2d31-4727-930b-2d2c70169a9e</tstamps>
+    </comp>
+    <comp ref="RN3">
+      <value>470</value>
+      <footprint>Resistor_THT:R_Array_SIP4</footprint>
+      <datasheet>https://www.bourns.com/docs/Product-Datasheets/4600x.pdf</datasheet>
+      <fields>
+        <field name="Manufacturer">Bourns Inc.</field>
+        <field name="Part">4604X-102-471LF</field>
+      </fields>
+      <libsource lib="Device" part="R_Pack02_SIP_Split" description="2 resistor network, parallel topology, SIP package, split"/>
+      <property name="Manufacturer" value="Bourns Inc."/>
+      <property name="Part" value="4604X-102-471LF"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Dual encoder controller.kicad_sch"/>
+      <property name="ki_description" value="2 resistor network, parallel topology, SIP package, split"/>
+      <property name="ki_keywords" value="R network parallel topology isolated"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>f4016458-7439-4ef9-a5bd-25e3c7258338 7124218f-a02d-4376-adc3-940b8b16b69d</tstamps>
+    </comp>
+    <comp ref="SW1">
+      <value>B3J-3300</value>
+      <footprint>Custom footprints:B3J-3300</footprint>
+      <datasheet>https://omronfs.omron.com/en_US/ecb/products/pdf/en-b3j.pdf</datasheet>
+      <fields>
+        <field name="Manufacturer">Omron Electronics Inc-EMC Div</field>
+        <field name="Part">B3J-3300</field>
+      </fields>
+      <libsource lib="Custom" part="B3J-2200" description=""/>
+      <property name="Manufacturer" value="Omron Electronics Inc-EMC Div"/>
+      <property name="Part" value="B3J-3300"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Dual encoder controller.kicad_sch"/>
+      <property name="ki_keywords" value="B3J-2200"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>d2cc7d12-7c89-423f-b6c7-72c9fe84f6dc</tstamps>
+    </comp>
+    <comp ref="U1">
+      <value>Itsy_Bitsy_32u4</value>
+      <footprint>Custom footprints:Itsy Bitsy 32u4</footprint>
+      <datasheet>https://cdn-learn.adafruit.com/downloads/pdf/introducting-itsy-bitsy-32u4.pdf</datasheet>
+      <fields>
+        <field name="Manufacturer">Adafruit, Samtec, Sullins</field>
+        <field name="Part">1x Itsy Bitsy - 3677, 1x SSW-105-01-T-S, 2x SSW-114-01-T-S, 1x PRPC040SAAN-RC</field>
+      </fields>
+      <libsource lib="custom" part="Itsy_Bitsy_32u4" description=""/>
+      <property name="Manufacturer" value="Adafruit, Samtec, Sullins"/>
+      <property name="Part" value="1x Itsy Bitsy - 3677, 1x SSW-105-01-T-S, 2x SSW-114-01-T-S, 1x PRPC040SAAN-RC"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="Dual encoder controller.kicad_sch"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>6b9350ca-388d-4714-87f9-eae5fbc2ba33</tstamps>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Connector" part="8P8C_Shielded">
+      <description>RJ connector, 8P8C (8 positions 8 connected), RJ31/RJ32/RJ33/RJ34/RJ35/RJ41/RJ45/RJ49/RJ61, Shielded</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>8P8C*</fp>
+        <fp>RJ31*</fp>
+        <fp>RJ32*</fp>
+        <fp>RJ33*</fp>
+        <fp>RJ34*</fp>
+        <fp>RJ35*</fp>
+        <fp>RJ41*</fp>
+        <fp>RJ45*</fp>
+        <fp>RJ49*</fp>
+        <fp>RJ61*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">8P8C_Shielded</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+        <pin num="3" name="" type="passive"/>
+        <pin num="4" name="" type="passive"/>
+        <pin num="5" name="" type="passive"/>
+        <pin num="6" name="" type="passive"/>
+        <pin num="7" name="" type="passive"/>
+        <pin num="8" name="" type="passive"/>
+        <pin num="SH" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Connector" part="Barrel_Jack_Switch_MountingPin">
+      <description>DC Barrel Jack with an internal switch and a mounting pin</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>BarrelJack*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Barrel_Jack_Switch_MountingPin</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+        <pin num="3" name="" type="passive"/>
+        <pin num="MP" name="MountPin" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Custom" part="B3J-2200">
+      <docs>B3J-2200</docs>
+      <footprints>
+        <fp>B3J-2_OMR</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">B3J-2200</field>
+        <field name="Footprint">B3J-2_OMR</field>
+        <field name="Datasheet">B3J-2200</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="unspecified"/>
+        <pin num="2" name="" type="unspecified"/>
+        <pin num="3" name="" type="unspecified"/>
+        <pin num="4" name="" type="unspecified"/>
+        <pin num="5" name="" type="unspecified"/>
+        <pin num="6" name="" type="unspecified"/>
+      </pins>
+    </libpart>
+    <libpart lib="Custom" part="EM14_Encoder">
+      <fields>
+        <field name="Reference">SW</field>
+      </fields>
+      <pins>
+        <pin num="1" name="B" type="input"/>
+        <pin num="2" name="+" type="input"/>
+        <pin num="3" name="2" type="input"/>
+        <pin num="4" name="1" type="input"/>
+        <pin num="5" name="A" type="input"/>
+        <pin num="6" name="-" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="C_Small">
+      <description>Unpolarized capacitor, small symbol</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C_Small</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="R">
+      <description>Resistor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+        <field name="Datasheet">~</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="R_Pack02_SIP_Split">
+      <description>2 resistor network, parallel topology, SIP package, split</description>
+      <docs>http://www.vishay.com/docs/31509/csc.pdf</docs>
+      <footprints>
+        <fp>R?Array?SIP*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">RN</field>
+        <field name="Value">R_Pack02_SIP_Split</field>
+        <field name="Footprint">Resistor_THT:R_Array_SIP4</field>
+        <field name="Datasheet">http://www.vishay.com/docs/31509/csc.pdf</field>
+      </fields>
+      <pins>
+        <pin num="1" name="R1.1" type="passive"/>
+        <pin num="2" name="R1.2" type="passive"/>
+        <pin num="3" name="R2.1" type="passive"/>
+        <pin num="4" name="R2.2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="custom" part="Itsy_Bitsy_32u4">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">Itsy_Bitsy_32u4</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Reset" type="input"/>
+        <pin num="2" name="5V" type="power_in"/>
+        <pin num="3" name="ARef" type="input"/>
+        <pin num="4" name="GND" type="power_in"/>
+        <pin num="5" name="18_A0" type="input"/>
+        <pin num="6" name="19_A1" type="input"/>
+        <pin num="7" name="20_A2" type="input"/>
+        <pin num="8" name="21_A3" type="input"/>
+        <pin num="9" name="22_A4" type="input"/>
+        <pin num="10" name="23_A5" type="input"/>
+        <pin num="11" name="15_SCK" type="input"/>
+        <pin num="12" name="16_MOSI" type="input"/>
+        <pin num="13" name="14_MISO" type="input"/>
+        <pin num="14" name="3.3V" type="input"/>
+        <pin num="15" name="Enable" type="input"/>
+        <pin num="16" name="Gnd" type="power_in"/>
+        <pin num="17" name="8_A8" type="input"/>
+        <pin num="18" name="6_A7" type="input"/>
+        <pin num="19" name="4_A6" type="input"/>
+        <pin num="20" name="0_RX" type="input"/>
+        <pin num="21" name="1_TX" type="input"/>
+        <pin num="22" name="2_SDA" type="input"/>
+        <pin num="23" name="~3_SCL" type="input"/>
+        <pin num="24" name="~5" type="input"/>
+        <pin num="25" name="7" type="input"/>
+        <pin num="26" name="~9_A9" type="input"/>
+        <pin num="27" name="~10_A10" type="input"/>
+        <pin num="28" name="~11" type="input"/>
+        <pin num="29" name="12_A11" type="input"/>
+        <pin num="30" name="~13_LED" type="input"/>
+        <pin num="31" name="VBus" type="power_in"/>
+        <pin num="32" name="Gnd" type="power_in"/>
+        <pin num="33" name="VBat" type="power_in"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="Connector">
+      <uri>C:\Program Files\KiCad\7.0\share\kicad\symbols\/Connector.kicad_sym</uri>
+    </library>
+    <library logical="Custom">
+      <uri>C:\Users\Ben\Documents\GitHub\Dual_encoder_controller\KiCAD/Custom.kicad_sym</uri>
+    </library>
+    <library logical="Device">
+      <uri>C:\Program Files\KiCad\7.0\share\kicad\symbols\/Device.kicad_sym</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="+3.3V">
+      <node ref="RN3" pin="2" pinfunction="R1.2" pintype="passive"/>
+      <node ref="RN3" pin="4" pinfunction="R2.2" pintype="passive"/>
+      <node ref="U1" pin="14" pinfunction="3.3V" pintype="input"/>
+    </net>
+    <net code="2" name="+5V">
+      <node ref="C1" pin="2" pintype="passive"/>
+      <node ref="EN1" pin="2" pinfunction="+" pintype="input"/>
+      <node ref="J1" pin="5" pintype="passive"/>
+      <node ref="U1" pin="2" pinfunction="5V" pintype="power_in"/>
+    </net>
+    <net code="3" name="+9V">
+      <node ref="J4" pin="1" pintype="passive"/>
+      <node ref="U1" pin="33" pinfunction="VBat" pintype="power_in"/>
+    </net>
+    <net code="4" name="/A1">
+      <node ref="EN1" pin="5" pinfunction="A" pintype="input"/>
+      <node ref="U1" pin="9" pinfunction="22_A4" pintype="input"/>
+    </net>
+    <net code="5" name="/A2">
+      <node ref="J1" pin="3" pintype="passive"/>
+      <node ref="U1" pin="6" pinfunction="19_A1" pintype="input"/>
+    </net>
+    <net code="6" name="/B1">
+      <node ref="EN1" pin="1" pinfunction="B" pintype="input"/>
+      <node ref="U1" pin="8" pinfunction="21_A3" pintype="input"/>
+    </net>
+    <net code="7" name="/B2">
+      <node ref="J1" pin="1" pintype="passive"/>
+      <node ref="U1" pin="5" pinfunction="18_A0" pintype="input"/>
+    </net>
+    <net code="8" name="/EN_SW1">
+      <node ref="EN1" pin="3" pinfunction="2" pintype="input"/>
+      <node ref="U1" pin="10" pinfunction="23_A5" pintype="input"/>
+    </net>
+    <net code="9" name="/EN_SW2">
+      <node ref="J1" pin="6" pintype="passive"/>
+      <node ref="U1" pin="7" pinfunction="20_A2" pintype="input"/>
+    </net>
+    <net code="10" name="/LED1+">
+      <node ref="R1" pin="2" pintype="passive"/>
+      <node ref="U1" pin="27" pinfunction="~10_A10" pintype="input"/>
+    </net>
+    <net code="11" name="/LED2+">
+      <node ref="J1" pin="8" pintype="passive"/>
+      <node ref="U1" pin="26" pinfunction="~9_A9" pintype="input"/>
+    </net>
+    <net code="12" name="/SCL">
+      <node ref="J2" pin="1" pintype="passive"/>
+      <node ref="RN3" pin="3" pinfunction="R2.1" pintype="passive"/>
+      <node ref="U1" pin="23" pinfunction="~3_SCL" pintype="input"/>
+    </net>
+    <net code="13" name="/SDA">
+      <node ref="J2" pin="3" pintype="passive"/>
+      <node ref="RN3" pin="1" pinfunction="R1.1" pintype="passive"/>
+      <node ref="U1" pin="22" pinfunction="2_SDA" pintype="input"/>
+    </net>
+    <net code="14" name="/SW1">
+      <node ref="SW1" pin="3" pintype="unspecified"/>
+      <node ref="SW1" pin="4" pintype="unspecified"/>
+      <node ref="U1" pin="11" pinfunction="15_SCK" pintype="input"/>
+    </net>
+    <net code="15" name="/SW2">
+      <node ref="J1" pin="7" pintype="passive"/>
+      <node ref="U1" pin="17" pinfunction="8_A8" pintype="input"/>
+    </net>
+    <net code="16" name="GND">
+      <node ref="C1" pin="1" pintype="passive"/>
+      <node ref="EN1" pin="4" pinfunction="1" pintype="input"/>
+      <node ref="EN1" pin="6" pinfunction="-" pintype="input"/>
+      <node ref="J1" pin="2" pintype="passive"/>
+      <node ref="J1" pin="4" pintype="passive"/>
+      <node ref="J1" pin="SH" pintype="passive"/>
+      <node ref="J2" pin="2" pintype="passive"/>
+      <node ref="J2" pin="4" pintype="passive"/>
+      <node ref="J2" pin="6" pintype="passive"/>
+      <node ref="J2" pin="8" pintype="passive"/>
+      <node ref="J2" pin="SH" pintype="passive"/>
+      <node ref="J4" pin="2" pintype="passive"/>
+      <node ref="J4" pin="3" pintype="passive"/>
+      <node ref="J4" pin="MP" pinfunction="MountPin" pintype="passive"/>
+      <node ref="SW1" pin="1" pintype="unspecified"/>
+      <node ref="SW1" pin="2" pintype="unspecified"/>
+      <node ref="SW1" pin="5" pintype="unspecified"/>
+      <node ref="U1" pin="16" pinfunction="Gnd" pintype="power_in"/>
+      <node ref="U1" pin="3" pinfunction="ARef" pintype="input"/>
+      <node ref="U1" pin="32" pinfunction="Gnd" pintype="power_in"/>
+      <node ref="U1" pin="4" pinfunction="GND" pintype="power_in"/>
+    </net>
+    <net code="17" name="Net-(R1-Pad1)">
+      <node ref="R1" pin="1" pintype="passive"/>
+      <node ref="SW1" pin="6" pintype="unspecified"/>
+    </net>
+    <net code="18" name="unconnected-(J2-Pad5)">
+      <node ref="J2" pin="5" pintype="passive+no_connect"/>
+    </net>
+    <net code="19" name="unconnected-(J2-Pad7)">
+      <node ref="J2" pin="7" pintype="passive+no_connect"/>
+    </net>
+    <net code="20" name="unconnected-(U1-0_RX-Pad20)">
+      <node ref="U1" pin="20" pinfunction="0_RX" pintype="input+no_connect"/>
+    </net>
+    <net code="21" name="unconnected-(U1-1_TX-Pad21)">
+      <node ref="U1" pin="21" pinfunction="1_TX" pintype="input+no_connect"/>
+    </net>
+    <net code="22" name="unconnected-(U1-4_A6-Pad19)">
+      <node ref="U1" pin="19" pinfunction="4_A6" pintype="input+no_connect"/>
+    </net>
+    <net code="23" name="unconnected-(U1-6_A7-Pad18)">
+      <node ref="U1" pin="18" pinfunction="6_A7" pintype="input+no_connect"/>
+    </net>
+    <net code="24" name="unconnected-(U1-7-Pad25)">
+      <node ref="U1" pin="25" pinfunction="7" pintype="input+no_connect"/>
+    </net>
+    <net code="25" name="unconnected-(U1-12_A11-Pad29)">
+      <node ref="U1" pin="29" pinfunction="12_A11" pintype="input+no_connect"/>
+    </net>
+    <net code="26" name="unconnected-(U1-14_MISO-Pad13)">
+      <node ref="U1" pin="13" pinfunction="14_MISO" pintype="input+no_connect"/>
+    </net>
+    <net code="27" name="unconnected-(U1-16_MOSI-Pad12)">
+      <node ref="U1" pin="12" pinfunction="16_MOSI" pintype="input+no_connect"/>
+    </net>
+    <net code="28" name="unconnected-(U1-Enable-Pad15)">
+      <node ref="U1" pin="15" pinfunction="Enable" pintype="input+no_connect"/>
+    </net>
+    <net code="29" name="unconnected-(U1-Reset-Pad1)">
+      <node ref="U1" pin="1" pinfunction="Reset" pintype="input+no_connect"/>
+    </net>
+    <net code="30" name="unconnected-(U1-VBus-Pad31)">
+      <node ref="U1" pin="31" pinfunction="VBus" pintype="power_in+no_connect"/>
+    </net>
+    <net code="31" name="unconnected-(U1-~5-Pad24)">
+      <node ref="U1" pin="24" pinfunction="~5" pintype="input+no_connect"/>
+    </net>
+    <net code="32" name="unconnected-(U1-~11-Pad28)">
+      <node ref="U1" pin="28" pinfunction="~11" pintype="input+no_connect"/>
+    </net>
+    <net code="33" name="unconnected-(U1-~13_LED-Pad30)">
+      <node ref="U1" pin="30" pinfunction="~13_LED" pintype="input+no_connect"/>
+    </net>
+  </nets>
+</export>
