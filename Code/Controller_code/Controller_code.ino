@@ -1,18 +1,26 @@
 #include <digitalWriteFast.h>
-#include <Wire.h>
+#include <elapsedMillis.h>
+#include "PacketSerial.h"
+
 #pragma pack(1) //Remove alignment padding bytes in structs - https://forum.pjrc.com/threads/50536-problem-with-union-in-Teensy-3-5
 struct encoderStruct{
-  uint16_t encoder_pos[2]; //Encoder PWM
-  uint8_t command; //Instruction from controller
-  uint8_t checksum; //Checksum
+  uint8_t command; //button presses (bit 0 = left push, bit 1 = right push, bit 2 = left enc, bit 3 = right enc.)
+  int16_t encoder_pos[2]; //Encoder PWM
 };
 //Command:
 //LSB: left_push, right_push, left_enc_button, right_enc_button, X, X, X, X
 const struct defaultEncoderStruct{
-  uint16_t encoder_pos[2] = {1,1}; //Encoder PWM
-  uint8_t command = 0; //Instruction from controller
-  uint8_t checksum = 0; //Checksum
+  uint8_t command = 0; //button presses (bit 0 = right push, bit 1 = left push, bit 2 = right enc, bit 3 = left enc.)
+  int16_t encoder_pos[2] = {0,0}; //Encoder PWM or command data
 } defaultEncoder;
+
+const struct prefixStruct{
+  uint8_t heartbeat = 0; //Empty command confirming connection is still good
+  uint8_t magic_number = 1; //Recv magic number at connection start and confirm with magic reply
+  uint8_t update_interval = 2; //Rate to send position updates to computer
+  uint8_t set_led = 3; //Change LED intensity
+  uint8_t disconnect = 4; //Computer has disconnected from controller
+} prefix;
 
 union BUFFERUNION //Convert binary buffer <-> config setup
 {
@@ -20,7 +28,10 @@ union BUFFERUNION //Convert binary buffer <-> config setup
    byte byte_buffer[sizeof(defaultEncoderStruct)];
 } encoder;
 
-const float scale[] = {1.001,1.01}; //Scales by which the intensity changes per unit knob turn - pushing encoder switches scales
+const static uint32_t COBS_BUFFER_SIZE = 110; //Size of the COBS buffer
+const static uint16_t HEARTBEAT_TIMEOUT = 10000;
+const static char MAGIC_RECEIVE[] = "p6hGvGAKtyRehDZMM0VO"; //Magic number received from GUI to verify this is an LED driver
+char MAGIC_SEND[] = "-1UltmSfFUudnRfC1Y923"; //Magic number received from GUI to verify this is an LED driver
 const uint8_t pinf_mask = B11110011; //Mask for pins used on portf
 const uint8_t pinb_mask = B00010010; //Mask for pins used on portb
 const uint8_t en_raw_mask = B11010010; //Mask for encoder pins on portf
@@ -31,7 +42,9 @@ const uint8_t en_order[] = {0, 1, 3, 2}; //Order of encoder quadrature values go
 const uint16_t DEBOUNCE = 40; //Switch debounce time (ms)
 const uint8_t pin_sw[] = {15, 8}; //button pin #
 const uint8_t pin_led[] = {9, 10}; //button led pin #
-const uint8_t device_id = 2;
+char temp_buffer[COBS_BUFFER_SIZE]; //Temporary buffer for preparing packets immediately before transmission
+uint8_t update_interval = 10; //Time in ms between position packets sent to computer
+bool serial_connection_active = false; //Whether there is an active serial connection to the computer
 uint8_t i; //index
 uint8_t j; //index #2
 uint8_t j_f; //Forward index #2
@@ -46,12 +59,14 @@ uint8_t en_order_index[2]; //index of encoders in encoder_order array - tracks e
 uint8_t cur_en[2]; //Current value of encoder - bits shifted so that A is b0 and B is b1
 float float_en_pos[] = {1,1}; //Floating point value of encoder - allows for gamma curve to LED control
 uint8_t scale_index; //index of current scale to be used
+uint8_t led_intensity[] = {255, 255}; //LED on intensities
 uint8_t command_mask; //Mask for flipping individual bits in the command byte
 
+PacketSerial_<COBS, 0, COBS_BUFFER_SIZE> usb; //Sets Encoder, framing character, buffer size
+elapsedMillis update_timer;
+elapsedMillis heartbeat;
+
 void setup() {
-  Wire.begin(device_id);                // join I2C bus with address #8
-  Wire.onRequest(requestEvent); // register event
-  
   //Set encoder pins
   for(i=18; i<24; i++) pinMode(i, INPUT_PULLUP);
 
@@ -68,11 +83,13 @@ void setup() {
   cur_pinb = PINB & pinb_mask;
   prev_pinb = cur_pinb;
 
- //Serial.begin(250000);
+  usb.begin(115200);
+  usb.setPacketHandler(&onPacketReceived);
+
 }
 
 void loop() {
-  while(true){
+  while(serial_connection_active){
     cur_pinf = PINF & pinf_mask; //check encoder
     cur_pinb = PINB & pinb_mask; //check pushbuttons
     if(cur_pinf != prev_pinf){ //if encoder changed
@@ -84,15 +101,18 @@ void loop() {
       prev_pinb = cur_pinb;
       checkButton();
     }
+    if(heartbeat >= HEARTBEAT_TIMEOUT) disconnect();
+    if(update_timer >= update_interval){
+      update_timer = 0; //Reset update interval timer
+      memcpy(temp_buffer, encoder.byte_buffer, sizeof(defaultEncoderStruct)); //Copy controller info to temp buffer
+      usb.send((const unsigned char*) temp_buffer, sizeof(defaultEncoderStruct)); //Send controller info
+      encoder.e.encoder_pos[0] = 0; //Zero encoder positions
+      encoder.e.encoder_pos[1] = 0;
+      usb.update(); //Check if a command was received
+    }
   }
-}
-
-void requestEvent() {
-  encoder.e.checksum = 0;
-  for(i=0; i<sizeof(defaultEncoderStruct) - 1; i++) encoder.e.checksum += encoder.byte_buffer[i];
-  encoder.e.checksum = 0-encoder.e.checksum; 
-  Wire.write(encoder.byte_buffer, sizeof(defaultEncoderStruct)); // respond with message of 6 bytes
-  // as expected by master
+  usb.update(); //If serial is not active, monitor the usb connection
+  delay(10);
 }
 
 void checkButton(){
@@ -109,10 +129,6 @@ void checkButton(){
       delay(DEBOUNCE);
     }
   }
-  if(!(cur_pinb & pinb_mask)){ //If both buttons are pressed
-    digitalWriteFast(LED_BUILTIN, HIGH);
-  }
-  else digitalWriteFast(LED_BUILTIN, LOW);
 }
 
 void checkSwitch(){
@@ -120,8 +136,6 @@ void checkSwitch(){
     command_mask = B00000100 << i;
     if(!(sw_raw_mask[i] & cur_pinf) && !(encoder.e.command & command_mask)){ //if button was just pressed
         encoder.e.command |= command_mask;
-        scale_index++;
-        scale_index %= (sizeof(scale)/sizeof(scale[0]));
         digitalWriteFast(LED_BUILTIN, HIGH);
         delay(DEBOUNCE);
     }
@@ -134,8 +148,8 @@ void checkSwitch(){
 }
 
 void checkEncoder(){
-  cur_en_raw = cur_pinf & en_raw_mask; //Extrace encoder a and b pin states
-  if(cur_en_raw != prev_en_raw){
+  cur_en_raw = cur_pinf & en_raw_mask; //Extract encoder a and b pin states
+  if(cur_en_raw != prev_en_raw){ //If encoder posistions changed
     prev_en_raw = cur_en_raw;
     
     //Decode the encoder
@@ -150,30 +164,14 @@ void checkEncoder(){
       j_f %= 4;
       j_r = j-1;
       j_r %= 4;
-      if(cur_en[i] == en_order[j]);
+      if(cur_en[i] == en_order[j]); //No rotation
       else if(cur_en[i] == en_order[j_f]){ //Encoder turned CW
+        encoder.e.encoder_pos[i]++;
         en_order_index[i]++;
-        if(encoder.e.encoder_pos[i] < 65535){ //If encoder isn't at max value
-          float_en_pos[i] *= scale[scale_index];
-          if(float_en_pos[i] > 65535) float_en_pos[i] = 65535;
-          encoder.e.encoder_pos[i] = round(float_en_pos[i]);
-        }
-        else{
-          encoder.e.encoder_pos[i] = 65535;
-          float_en_pos[i] = 65535;
-        } 
       }
       else if(cur_en[i] == en_order[j_r]){ //Encoder turned CCW
-        en_order_index[i]--;
-        if(encoder.e.encoder_pos[i] > 1){
-          float_en_pos[i] /= scale[scale_index];
-          if(float_en_pos[i] < 1) float_en_pos[i] = 1;
-          encoder.e.encoder_pos[i] = round(float_en_pos[i]);
-        }
-        else{
-          encoder.e.encoder_pos[i] = 1;
-          float_en_pos[i] = 1;
-        } 
+        encoder.e.encoder_pos[i]--;
+        en_order_index[i]--; 
       }
       else{ //Encoder skipped step
         en_order_index[i] += 2; 
@@ -182,8 +180,44 @@ void checkEncoder(){
   }
 }
 
+static void onPacketReceived(const uint8_t* buffer, size_t size){
+  // Route decoded packet based on prefix byte
+  heartbeat = 0; //Reset heartbeat timer as a serial packet has been received
+  uint8_t buffer_prefix = buffer[0];
+  if(buffer_prefix == prefix.heartbeat) serial_connection_active = true; //Start/continue sending status packets; 
+  else if(buffer_prefix == prefix.magic_number) magicExchange(buffer, size);
+  else if(buffer_prefix == prefix.update_interval) setUpdateInterval(buffer, size);
+  else if(buffer_prefix == prefix.set_led) setLed(buffer, size);
+  else if(buffer_prefix == prefix.disconnect) disconnect();
+}
 
+static void magicExchange(const uint8_t* buffer, size_t size){
+  uint32_t a;
+  if(size == sizeof(MAGIC_RECEIVE)){
+    for(a=0; a<size; a++){
+      if(buffer[a+1] != MAGIC_RECEIVE[a]){
+        break;
+      }
+    }
+    if(a==size-1){
+      MAGIC_SEND[0] = prefix.magic_number;
+      usb.send((const unsigned char*) MAGIC_SEND, size);
+    }
+  }
+}
 
+static void setUpdateInterval(const uint8_t* buffer, size_t size){
+  update_interval = buffer[1];
+}
+
+static void setLed(const uint8_t* buffer, size_t size){
+  analogWrite(pin_led[0], buffer[1]);
+  analogWrite(pin_led[1], buffer[2]);
+}
+
+static void disconnect(){
+  serial_connection_active = false; //Stop sending status packets
+}
 
 
 
