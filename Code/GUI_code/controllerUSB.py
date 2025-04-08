@@ -378,8 +378,7 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
 
     def downloadDriverConfiguration(self, reply=None):
         if reply is not None:
-            return
-            fileIO.bytesToControllerConfig(reply, self.gui, self.prefix_dict["downloadDriverConfiguration"])
+            fileIO.bytesToControllerConfig(reply, self.gui)
         else:
             if self.portConnected():
                 self.sendWithReply(self.prefix_dict["downloadDriverConfiguration"])

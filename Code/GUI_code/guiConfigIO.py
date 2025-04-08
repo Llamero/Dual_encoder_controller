@@ -500,18 +500,18 @@ def showMessage(gui, text):
 
 ########################################################################################################################################################################################
 
-def bytesToControllerConfig(byte_array, gui, prefix):
+def bytesToControllerConfig(byte_array, gui):
     start_index = 0
     index = 0
 
     #Verify checksum of config file
-    checksum = (sum(byte_array) + prefix) & 0xFF #https://stackoverflow.com/questions/44611057/checksum-generation-from-sum-of-bits-in-python
+    checksum = (sum(byte_array)) & 0xFF #https://stackoverflow.com/questions/44611057/checksum-generation-from-sum-of-bits-in-python
     if checksum == 0:
         #Get driver name - ends with NULL
         while int(byte_array[index]) != 0:
             index += 1
         gui.controller_status_dict["Name"] = byte_array[start_index:index].decode().rstrip()
-        gui.setValue(gui.main_model["Controller"]["Name"], gui.controller_status_dict["Name"])
+        gui.main_model["Controller"]["Name"].setText(str(gui.controller_status_dict["Name"]))
 
         # Get led names - end with NULL
         for side in ["Left Name", "Right Name"]:

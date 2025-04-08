@@ -19,7 +19,7 @@ const struct defaultConfigurationStruct{ //65 bytes
   float knob_rates[2][4] = {{1.01, 1.0001, 0, 0}, {1.01, 1.0001, 0, 0}}; //Different rates the knob gamma is applied as the knob turns
   uint8_t led_intensity[2] = {1, 255}; //Indicator LED intensity when off and on
   uint8_t update_interval = 10; //rate to send updates to GUI
-  uint8_t checksum = 251;
+  uint8_t checksum = 253;
 } defaultConfig;
 
 struct encoderStruct{
