@@ -14,6 +14,7 @@ from timeit import default_timer as timer
 import pickle
 import syncPlotWindow
 
+N_STEPS = 4
 N_BOARDS = 3
 N_LEDS = 4
 DIAL_UPDATE_RATE = 0.05 #Time in s between updates from dial when in manual control - prevents dial from locking GUI with continuous updates when dial is swept
@@ -79,6 +80,25 @@ class Ui(QtWidgets.QMainWindow):
                                                                                  ("COM Port", 0),
                                                                                  ("Serial", 0),
                                                                                  ("Control", 0)])
+
+
+        self.controller_status_dynamic_dict = OrderedDict()
+        for key in ["Encoder", "Switch", "Button", "LED"]:
+            self.controller_status_dynamic_dict[key] = OrderedDict()
+            for side in ["Left", "Right"]:
+                self.controller_status_dynamic_dict[key][side] = 0
+
+        self.controller_status_dict = OrderedDict(list(self.controller_status_dynamic_dict.items()) + [("Name", 0),
+                                                                                 ("COM Port", 0),
+                                                                                 ("Serial", 0),
+                                                                                 ("Control", 0),
+                                                                                 ("Left Name", 0),
+                                                                                 ("Right Name", 0),
+                                                                                 ("Left Rates", [0] * N_STEPS),
+                                                                                 ("Right Rates", [0] * N_STEPS),
+                                                                                 ("LED Off", 0),
+                                                                                 ("LED On", 0),
+                                                                                 ("Interval", 0)])
 
         self.status_window_list = []
         self.state_dict = OrderedDict(
@@ -210,7 +230,7 @@ class Ui(QtWidgets.QMainWindow):
     def updateSerialNumber(self, serial_number, controller_num = False):
         if controller_num:
             self.main_model["Controller"]["Serial"].setText(serial_number)
-#            self.status_dict["Controller"]["Serial"] = serial_number
+            self.controller_status_dict["Serial"] = serial_number
         else:
             self.configure_name_driver_serial_label2.setText(serial_number)
             self.main_model["Serial"].setText(serial_number)

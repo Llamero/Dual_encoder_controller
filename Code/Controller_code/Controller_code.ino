@@ -7,7 +7,7 @@
 struct configurationStruct{ //65 bytes
   char controller_name[16]; //Name of LED driver: "default name"
   char encoder_name[2][16]; //Name of LED driver: "default name"
-  float knob_rates[4]; //Different rates the knob gamma is applied as the knob turns
+  float knob_rates[2][4]; //Different rates the knob gamma is applied as the knob turns
   uint8_t led_intensity[2]; //Indicator LED intensities when off and on
   uint8_t update_interval; //rate to send updates to GUI
   uint8_t checksum;
@@ -16,10 +16,10 @@ struct configurationStruct{ //65 bytes
 const struct defaultConfigurationStruct{ //65 bytes
   char controller_name[16] = "Unnamed driver "; //Name of LED driver: "default name"
   char encoder_name[2][16] = {"Left Encoder   ", "Right Encoder  "}; //Name of LED driver: "default name"
-  float knob_rates[4] = {1.01, 1.0001, 0, 0}; //Different rates the knob gamma is applied as the knob turns
+  float knob_rates[2][4] = {{1.01, 1.0001, 0, 0}, {1.01, 1.0001, 0, 0}}; //Different rates the knob gamma is applied as the knob turns
   uint8_t led_intensity[2] = {1, 255}; //Indicator LED intensity when off and on
   uint8_t update_interval = 10; //rate to send updates to GUI
-  uint8_t checksum = 10;
+  uint8_t checksum = 251;
 } defaultConfig;
 
 struct encoderStruct{
@@ -259,7 +259,7 @@ static void sendConfiguration(){
   initializeConfigurations();
   memcpy(temp_buffer+1, conf.byte_buffer, sizeof(conf.byte_buffer));
   temp_buffer[0] = prefix.send_config;
-  usb.send((const unsigned char*) temp_buffer, sizeof(conf.byte_buffer)); //Send controller info
+  usb.send((const unsigned char*) temp_buffer, sizeof(conf.byte_buffer)+1); //Send controller info
 }
 
 static void recvConfiguration(const uint8_t* buffer, size_t size){
@@ -356,9 +356,9 @@ void loadDefaultsToEEPROM(){
   uint8_t *buffer_ptr;
   uint16_t buffer_size;
   uint16_t EEPROM_address = 0;
-  char message[] = "-A valid driver configuration was not found on EEPROM, so default settings will be loaded.";
-  message[0] = prefix.message;
-  usb.send((const unsigned char*) message, sizeof(message));
+  // char message[] = "-A valid driver configuration was not found on EEPROM, so default settings will be loaded.";
+  // message[0] = prefix.message;
+  // usb.send((const unsigned char*) message, sizeof(message));
   
   //Lambda functions in C++11 rock! https://stackoverflow.com/questions/4324763/can-we-have-functions-inside-functions-in-c
   auto loadEEPROM = [&] (){

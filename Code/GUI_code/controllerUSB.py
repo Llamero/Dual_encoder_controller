@@ -10,12 +10,10 @@ import time
 import struct
 import guiSequence as seq
 import guiMapper
-import tempfile
-import sys
 from timeit import default_timer as timer
 import traceback
 import pyautogui
-import serial #Port needs to be opened first with the pySerial  - QtSerial can't rx data otherwise
+
 
 # Teensy USB serial microcontroller program id data:
 VENDOR_ID = 0x239A
@@ -109,8 +107,6 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
 
     def connectSerial(self, port):
         #try:
-            ser = serial.Serial(port)  #Port needs to be opened first with the pySerial  - QtSerial can't rx data otherwise
-            ser.close()  # close port
             self.active_port = QSerialPort(port, baudRate=QSerialPort.Baud115200, readyRead=self.receive)
             if not self.active_port.isOpen(): #Close serial port if it is already open
                 self.active_port.setBaudRate(QSerialPort.Baud9600)
@@ -119,9 +115,11 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
                 self.active_port.setStopBits(QSerialPort.OneStop)
                 self.active_port.setFlowControl(QSerialPort.NoFlowControl)
                 if self.active_port.open(QtCore.QIODevice.ReadWrite): #Open serial connection
+                    self.active_port.setDataTerminalReady(True) #Essential flag to send to ItsyBitsy to have it send serial data back.
+                    self.active_port.setRequestToSend(True) #Essential flag to send to ItsyBitsy to have it send serial data back.
                     self.active_port.readyRead.connect(self.receive)
                     self.active_port.clear() #Clear buffer of any remaining data
-                    self.gui.status_dict["COM Port"] = self.getPortInfo(self.active_port)["Port"]
+                    self.gui.controller_status_dict["COM Port"] = self.getPortInfo(self.active_port)["Port"]
                     self.active_port.errorOccurred.connect(self.disconnectSerial) #Add signal for a connection error -
                     return True
                 else:
@@ -153,10 +151,12 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
                     self.active_port.clear() #Clear buffer of any remaining data
                     self.active_port.close() #close connection
                 self.active_port = None
+            elif error == 12: #Error 12 on wait for bytes is a bug, so disregard: https://forum.qt.io/topic/41833/solved-qserialport-waitforbyteswritten-returns-false
+                return
 
             self.gui.menu_connection_controllers_disconnect.setChecked(True)
             self.gui.updateSerialNumber(self.default_serial_number, True)
-            self.gui.status_dict["COM Port"] = "Disconnect"
+            self.gui.controller_status_dict["COM Port"] = "Disconnect"
 
     @QtCore.pyqtSlot()
     def receive(self):
@@ -253,12 +253,12 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
         else:
             port = action.toolTip()
             serial_number = action.whatsThis()
+            if len(serial_number) == 0:
+                serial_number = "N/A"
             if self.connectSerial(port):
                 self.initializing_connection = True
                 self.downloadDriverConfiguration()
-                self.updateStatus()
                 self.gui.updateSerialNumber(serial_number, True)
-                self.downloadSyncConfiguration()
 
             else:
                 self.conn_menu_action_group.removeAction(action)
@@ -378,7 +378,8 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
 
     def downloadDriverConfiguration(self, reply=None):
         if reply is not None:
-            fileIO.bytesToConfig(reply, self.gui, self.prefix_dict["downloadDriverConfiguration"])
+            return
+            fileIO.bytesToControllerConfig(reply, self.gui, self.prefix_dict["downloadDriverConfiguration"])
         else:
             if self.portConnected():
                 self.sendWithReply(self.prefix_dict["downloadDriverConfiguration"])
@@ -388,7 +389,7 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
             pass
         else:
             if self.portConnected():
-                self.sendWithoutReply(fileIO.configToBytes(self.gui, self.prefix_dict["uploadDriverConfiguration"]))
+                self.sendWithoutReply(fileIO.controllerConfigToBytes(self.gui, self.prefix_dict["uploadDriverConfiguration"]))
 
     def downloadSyncConfiguration(self, reply=None):
         if reply is not None:
