@@ -24,6 +24,7 @@ debug = False
 
 class statusWindow(QtWidgets.QWidget):
     status_signal = QtCore.pyqtSignal(object)  # Need to initialize outside of init() https://stackoverflow.com/questions/2970312/pyqt4-qtcore-pyqtsignal-object-has-no-attribute-connect
+    controller_status_signal = QtCore.pyqtSignal(object)  # Need to initialize outside of init() https://stackoverflow.com/questions/2970312/pyqt4-qtcore-pyqtsignal-object-has-no-attribute-connect
 
     def __init__(self, app, main_window):
         self.app = app
@@ -45,6 +46,11 @@ class statusWindow(QtWidgets.QWidget):
         self.status_emit = self.status_signal.emit #Initialize instance of function so it can be explicitly disconnected later
         self.gui.status_signal.connect(self.status_emit)  #Connect mainWindow status signal to dialog status signal
         self.status_signal.connect(self.updateStatus) #Update status when new status signal is received
+
+        self.controller_status_emit = self.controller_status_signal.emit #Initialize instance of function so it can be explicitly disconnected later
+        self.gui.controller_status_signal.connect(self.controller_status_emit)  #Connect mainWindow status signal to dialog status signal
+        self.controller_status_signal.connect(self.controllerUpdateStatus) #Update status when new status signal is received
+
         self.plot_timeline = guiMapper.TimeLine(loopCount=0, interval=100) #Animation object for animating plots
 
         #Initialize plot data
@@ -151,6 +157,9 @@ class statusWindow(QtWidgets.QWidget):
             else: #Calculate running average of measured values per update
                 self.status_dict[key] += status[key]
         self.status_dict["Count"] += 1
+
+    def controllerUpdateStatus(self, status):
+        pass
 
     def updateStatusWindow(self):
         round_to_n = lambda x, n: x if x == 0 else round(x, -int(math.floor(math.log10(abs(x)))) + (n - 1)) #Roudn to sig fig - https://stackoverflow.com/questions/3410976/how-to-round-a-number-to-significant-figures-in-python
@@ -282,6 +291,18 @@ class statusWindow(QtWidgets.QWidget):
                         status_plot.setYRange(0, max_value, padding=0)
                         status_plot.plot(x_values, y_list, pen=pg.mkPen(color_list[board-1], width=1), connect="finite", clear=clear_graph)
 
+        #Update controller status
+        for key in ["Button", "Switch", "LED"]:
+            for side in ["Left", "Right"]:
+                value = self.gui.controller_status_dict[key][side] > 0
+                widget = eval("self.controller_" + side.lower() + "_" + key.lower() + "_button")
+                widget.setChecked(value)
+        for side in ["Left", "Right"]:
+            value = self.gui.controller_status_dict["Encoder"][side]%256
+            widget = eval("self.controller_" + side.lower() + "_dial")
+            widget.setValue(value)
+
+
     def updateLabel(self, key, value, unit = ""):
         prefix = key
         board_number = key[-1]
@@ -297,9 +318,11 @@ class statusWindow(QtWidgets.QWidget):
 
         #Disconnect class instance from MainWindow signals
         self.gui.status_signal.disconnect(self.status_emit)
+        self.gui.controller_status_signal.disconnect(self.controller_status_emit)
 
         #Disconnect internal signals
         self.status_signal.disconnect()  # Connect mainWindow status signal to dialog status signal
+        self.controller_status_signal.disconnect()
 
         #Explicity delete timeline
         self.plot_timeline.deleteLater()

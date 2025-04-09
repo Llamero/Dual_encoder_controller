@@ -23,7 +23,7 @@ const struct defaultConfigurationStruct{ //65 bytes
 } defaultConfig;
 
 struct encoderStruct{
-  uint8_t command; //button presses (bit 0 = left push, bit 1 = right push, bit 2 = left enc, bit 3 = right enc., bit 4 = left LED on, bit 5 = right LED on.)
+  uint8_t command; //button presses (bit 0 = left push, bit 1 = right push, bit 2 = left enc, bit 3 = right enc., bit 4 = left LED on, bit 5 = right LED on, bit 6 = built-in LED on.)
   int16_t encoder_pos[2]; //Encoder PWM
 };
 
@@ -64,12 +64,12 @@ char MAGIC_SEND[] = "-1UltmSfFUudnRfC1Y923"; //Magic number received from GUI to
 const uint8_t pinf_mask = B11110011; //Mask for pins used on portf
 const uint8_t pinb_mask = B00010010; //Mask for pins used on portb
 const uint8_t en_raw_mask = B11010010; //Mask for encoder pins on portf
-const uint8_t sw_raw_mask[] = {B00000001, B00100000}; //Mask for encoder switch pins on portf
+const uint8_t sw_raw_mask[] = {B00100000, B00000001}; //Mask for encoder switch pins on portf
 const uint8_t button_mask[] = {B00010000, B00000010}; //Mask for button pins on portb
 const uint8_t en_pin_mask[][2] = {{B00000010, B00010000}, {B01000000, B10000000}}; //Masks for individial encoder quadrature pins on portf
 const uint8_t en_order[] = {0, 1, 3, 2}; //Order of encoder quadrature values goign CW
 const uint16_t DEBOUNCE = 40; //Switch debounce time (ms)
-const uint8_t pin_sw[] = {15, 8}; //button pin #
+const uint8_t pin_button[] ={8, 15}; //button pin #
 const uint8_t pin_led[] = {9, 10}; //button led pin #
 char temp_buffer[COBS_BUFFER_SIZE]; //Temporary buffer for preparing packets immediately before transmission
 uint8_t temp_size; //Size of current data packet on temp buffer
@@ -98,15 +98,7 @@ elapsedMillis heartbeat;
 
 void setup() {
   Serial.begin(115200);
-  // while(true){
-  //   while(!Serial);
-  //   digitalWrite(pin_led[0], HIGH);
-  //   while(Serial.available()){
-  //     char a = Serial.read();
-  //     Serial.print(a);
-  //     digitalWrite(LED_BUILTIN, HIGH);
-  //   }
-  // }
+
   //Load default structs
   memcpy(conf.byte_buffer, &defaultConfig, sizeof(conf.byte_buffer));
   memcpy(encoder.byte_buffer, &defaultEncoder, sizeof(encoder.byte_buffer));
@@ -116,7 +108,7 @@ void setup() {
 
   //Set switch pins
   for(i=0; i<2; i++){
-    pinMode(pin_sw[i], INPUT_PULLUP);
+    pinMode(pin_button[i], INPUT_PULLUP);
     pinMode(pin_led[i], OUTPUT);
   }
 
@@ -158,12 +150,10 @@ void checkButton(){
   for(i=0; i<2; i++){
     command_mask = B00000001 << i;
     if(!(cur_pinb & button_mask[i]) && !(encoder.e.command & command_mask)){ //if button was just pressed
-      digitalWriteFast(pin_led[i], HIGH);
       encoder.e.command |= command_mask;
       delay(DEBOUNCE);
     }
     else if((cur_pinb & button_mask[i]) && (encoder.e.command & command_mask)){ //If button was just released
-      digitalWriteFast(pin_led[i], LOW);
       encoder.e.command &= ~command_mask;
       delay(DEBOUNCE);
     }
@@ -175,12 +165,10 @@ void checkSwitch(){
     command_mask = B00000100 << i;
     if(!(sw_raw_mask[i] & cur_pinf) && !(encoder.e.command & command_mask)){ //if button was just pressed
         encoder.e.command |= command_mask;
-        digitalWriteFast(LED_BUILTIN, HIGH);
         delay(DEBOUNCE);
     }
     else if((sw_raw_mask[i] & cur_pinf) && (encoder.e.command & command_mask)){ //If button was just released
       encoder.e.command &= ~command_mask;
-      digitalWriteFast(LED_BUILTIN, LOW);
       delay(DEBOUNCE);
     }
   }
@@ -192,9 +180,10 @@ void checkEncoder(){
     prev_en_raw = cur_en_raw;
     
     //Decode the encoder
-    cur_en[0] = (cur_en_raw & en_pin_mask[0][0])>>1;
-    cur_en[0] += (cur_en_raw & en_pin_mask[0][1])>>3;
-    cur_en[1] = cur_en_raw >> 6;
+    cur_en[0] = cur_en_raw >> 6;
+    cur_en[1] = (cur_en_raw & en_pin_mask[0][0])>>1;
+    cur_en[1] += (cur_en_raw & en_pin_mask[0][1])>>3;
+    
     
     //Find direction of rotation
     for(i=0; i<2; i++){
@@ -229,21 +218,19 @@ static void onPacketReceived(const uint8_t* buffer, size_t size){
   else if(buffer_prefix == prefix.recv_config) recvConfiguration(buffer, size);
   else if(buffer_prefix == prefix.send_id) sendId();
   else if(buffer_prefix == prefix.encoder_status) sendUpdate();
+  else if(buffer_prefix == prefix.set_led) setLed(buffer, size);
   else if(buffer_prefix == prefix.disconnect) disconnect();
 }
 
 static void magicExchange(const uint8_t* buffer, size_t size){
   uint32_t a;
-digitalWrite(pin_led[1], HIGH);
   if(size == sizeof(MAGIC_RECEIVE)){
     for(a=0; a<size; a++){
       if(buffer[a+1] != MAGIC_RECEIVE[a]){
         break;
       }
     }
-    digitalWrite(LED_BUILTIN, LOW);
     if(a==size-1){
-digitalWrite(pin_led[0], HIGH);
       MAGIC_SEND[0] = prefix.magic_number;
       usb.send(MAGIC_SEND, sizeof(MAGIC_SEND)-1); //-1 to remove null at end of string
     }
@@ -251,8 +238,18 @@ digitalWrite(pin_led[0], HIGH);
 }
 
 static void setLed(const uint8_t* buffer, size_t size){
-  analogWrite(pin_led[0], conf.c.led_intensity[buffer[1]]);
-  analogWrite(pin_led[1], conf.c.led_intensity[buffer[2]]);
+  if(size == 4){
+    analogWrite(pin_led[0], conf.c.led_intensity[buffer[1]]);
+    analogWrite(pin_led[1], conf.c.led_intensity[buffer[2]]);
+    digitalWriteFast(LED_BUILTIN, buffer[3]);
+
+    uint8_t mask = B00010000;
+    for(uint8_t a=0; a<size-1; a++){
+      if(buffer[a+1]) encoder.e.command |= mask;
+      else encoder.e.command &= ~mask;
+      mask <<= 1;
+    }
+  }
 }
 
 static void sendConfiguration(){
@@ -312,8 +309,6 @@ static void disconnect(){
   temp_buffer[0] = prefix.disconnect; //Send disconnect command
   usb.send((const unsigned char*) temp_buffer, 1);
   serial_connection_active = false; //Stop sending status packets
-delay(100);
-digitalWrite(pin_led[0], LOW);
 }
 
 //////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM

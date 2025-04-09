@@ -13,6 +13,7 @@ import sys
 from timeit import default_timer as timer
 import pickle
 import syncPlotWindow
+import copy
 
 N_STEPS = 4
 N_BOARDS = 3
@@ -27,6 +28,7 @@ if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
 
 class Ui(QtWidgets.QMainWindow):
     status_signal = QtCore.pyqtSignal(object) #Need to initialize outside of init() https://stackoverflow.com/questions/2970312/pyqt4-qtcore-pyqtsignal-object-has-no-attribute-connect
+    controller_status_signal = QtCore.pyqtSignal(object)  # Need to initialize outside of init() https://stackoverflow.com/questions/2970312/pyqt4-qtcore-pyqtsignal-object-has-no-attribute-connect
     sync_update_signal = QtCore.pyqtSignal(object)  # Need to initialize outside of init() https://stackoverflow.com/questions/2970312/pyqt4-qtcore-pyqtsignal-object-has-no-attribute-connect
 
     def __init__(self, app):
@@ -83,12 +85,26 @@ class Ui(QtWidgets.QMainWindow):
 
 
         self.controller_status_dynamic_dict = OrderedDict()
-        for key in ["Encoder", "Switch", "Button", "LED"]:
+        for key in ["Button", "Switch", "LED", "Encoder"]:
             self.controller_status_dynamic_dict[key] = OrderedDict()
             for side in ["Left", "Right"]:
                 self.controller_status_dynamic_dict[key][side] = 0
+        self.controller_status_dynamic_dict["Built-in"] = 0
 
-        self.controller_status_dict = OrderedDict(list(self.controller_status_dynamic_dict.items()) + [("Name", 0),
+        # self.controller_status_dict = OrderedDict(list(self.controller_status_dynamic_dict.items()) + [("Name", 0),
+        #                                                                          ("COM Port", 0),
+        #                                                                          ("Serial", 0),
+        #                                                                          ("Control", 0),
+        #                                                                          ("Left Name", 0),
+        #                                                                          ("Right Name", 0),
+        #                                                                          ("Left Rates", [0] * N_STEPS),
+        #                                                                          ("Right Rates", [0] * N_STEPS),
+        #                                                                          ("LED Off", 0),
+        #                                                                          ("LED On", 0),
+        #                                                                          ("Interval", 0)])
+
+        self.controller_status_dict = copy.deepcopy(self.controller_status_dynamic_dict)
+        self.controller_status_dict.update(OrderedDict([("Name", 0),
                                                                                  ("COM Port", 0),
                                                                                  ("Serial", 0),
                                                                                  ("Control", 0),
@@ -98,7 +114,7 @@ class Ui(QtWidgets.QMainWindow):
                                                                                  ("Right Rates", [0] * N_STEPS),
                                                                                  ("LED Off", 0),
                                                                                  ("LED On", 0),
-                                                                                 ("Interval", 0)])
+                                                                                 ("Interval", 0)]))
 
         self.status_window_list = []
         self.state_dict = OrderedDict(

@@ -59,7 +59,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
           <item row="0" column="1">
-           <widget class="QLabel" name="text_driver_serial_label">
+           <widget class="QLabel" name="text_serial_label">
             <property name="font">
              <font>
               <pointsize>12</pointsize>
@@ -79,7 +79,7 @@
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QLabel" name="text_driver_name_label">
+           <widget class="QLabel" name="text_name_label">
             <property name="font">
              <font>
               <pointsize>12</pointsize>
@@ -99,7 +99,7 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="text_driver_com_port_label">
+           <widget class="QLabel" name="text_com_port_label">
             <property name="font">
              <font>
               <pointsize>12</pointsize>
@@ -119,7 +119,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLabel" name="text_driver_control_label">
+           <widget class="QLabel" name="text_control_label">
             <property name="toolTip">
              <string>Whether the driver is being controlled mechnically or via software.</string>
             </property>
@@ -682,16 +682,34 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QRadioButton" name="controller_left_encoder_button">
+           <widget class="QRadioButton" name="controller_left_switch_button">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>Encoder Switch</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QRadioButton" name="controller_left_push_button">
+           <widget class="QRadioButton" name="controller_left_button_button">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>Pushbutton</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -703,9 +721,18 @@
            </widget>
           </item>
           <item row="4" column="0">
-           <widget class="QRadioButton" name="controller_left_LED_button">
+           <widget class="QRadioButton" name="controller_left_led_button">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>LED</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -732,16 +759,37 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QRadioButton" name="controller_right_encoder_button">
+           <widget class="QRadioButton" name="controller_right_switch_button">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>Encoder Switch</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QRadioButton" name="controller_right_push_button">
+           <widget class="QRadioButton" name="controller_right_button_button">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>Pushbutton</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -753,9 +801,18 @@
            </widget>
           </item>
           <item row="4" column="0">
-           <widget class="QRadioButton" name="controller_right_LED_button">
+           <widget class="QRadioButton" name="controller_right_led_button">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>LED</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
             </property>
            </widget>
           </item>

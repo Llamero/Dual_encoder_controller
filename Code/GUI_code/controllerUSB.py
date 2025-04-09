@@ -57,9 +57,7 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
         self.initializing_connection = True #Flag to suppress unnecessary notifications if connection is being initialized
         self.stop_receive = False #Blocks receive thread when a packet is being processed
         self.heartbeat_timer = timer() #Timer to track if a heartbeat signal needs to be sent
-        self.autoclick_mouse = False #Automatically click the mouse when the sync switches to the set state
-        self.autoclick_state = False #State of the sync status that will trigger an auto-mouse click
-        self.autoclick_position = (0, 0) #Position to click mouse
+        self.gui.controller_status_signal.connect(self.controllerChanged)  # Connect mainWindow status signal to dialog status signal
 
         for action in self.gui.menu_connection_controllers.actions():
             self.conn_menu_action_group.addAction(action)
@@ -259,6 +257,7 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
                 self.initializing_connection = True
                 self.downloadDriverConfiguration()
                 self.gui.updateSerialNumber(serial_number, True)
+                self.showDriverMessage()
 
             else:
                 self.conn_menu_action_group.removeAction(action)
@@ -310,25 +309,18 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
                             "disconnectSerial": 14,
                             "measurePeriod": 15,
                             "testCurrent": 16,
-                            "testVolume": 17}
+                            "testVolume": 17,
+                            "setLed": 18}
 
         self.command_dict = {self.prefix_dict["showDriverMessage"]: self.showDriverMessage, # Mapping of prefix to function that will process the command
                              self.prefix_dict["magicNumberCheck"]: self.magicNumberCheck,
                              self.prefix_dict["downloadDriverConfiguration"]: self.downloadDriverConfiguration,
                              self.prefix_dict["uploadDriverConfiguration"]: self.uploadDriverConfiguration,
-                             self.prefix_dict["downloadSyncConfiguration"]: self.downloadSyncConfiguration,
-                             self.prefix_dict["uploadSyncConfiguration"]: self.uploadSyncConfiguration,
-                             self.prefix_dict["downloadSeqFile"]: self.downloadSeqFile,
-                             self.prefix_dict["uploadSeqFile"]: self.uploadSeqFile,
                              self.prefix_dict["downloadDriverId"]: self.downloadDriverId,
                              self.prefix_dict["uploadTime"]: self.uploadTime,
-                             self.prefix_dict["uploadStream"]: self.uploadStream,
-                             self.prefix_dict["downloadStream"]: self.downloadStream,
                              self.prefix_dict["updateStatus"]: self.updateStatus,
-                             self.prefix_dict["disconnectSerial"]: self.disconnectSerial,
-                             self.prefix_dict["measurePeriod"]: self.measurePeriod,
-                             self.prefix_dict["testCurrent"]: self.testCurrent,
-                             self.prefix_dict["testVolume"]: self.testVolume}
+                             self.prefix_dict["setLed"]: self.setLed,
+                             self.prefix_dict["disconnectSerial"]: self.disconnectSerial}
 
     def showDriverMessage(self, reply=None):
         if reply is not None:
@@ -390,227 +382,59 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
             if self.portConnected():
                 self.sendWithoutReply(fileIO.controllerConfigToBytes(self.gui, self.prefix_dict["uploadDriverConfiguration"]))
 
-    def downloadSyncConfiguration(self, reply=None):
-        if reply is not None:
-            if fileIO.bytesToSync(reply, self.gui, self.prefix_dict["downloadSyncConfiguration"]):
-                self.downloadSeqFile()
+    def setLed(self, reply=None):
+        led = [0]*3
+        if isinstance(reply, list) and len(reply) in [2,3]:
+            led[0] = reply[0] > 0
+            led[1] = reply[1] > 0
+            if len(reply) == 2:
+                led[2] = False
             else:
-                self.showMessage("Error: Invalid Sync configuration packet was received.")
-        else:
-            if self.portConnected():
-                self.gui.startSplash("download")
-                self.sendWithReply(self.prefix_dict["downloadSyncConfiguration"])
-
-    def uploadSyncConfiguration(self, reply=None):
-        if reply is not None:
-            pass
-        else:
-            if self.portConnected():
-                self.gui.startSplash("upload")
-                message = fileIO.syncToBytes(self.gui, self.prefix_dict["uploadSyncConfiguration"])
-                self.sendWithReply(self.prefix_dict["uploadSeqFile"], message)
-
-    def downloadSeqFile(self, reply=None, widget=None):
-        message = bytearray()
-        if reply is not None:
-            if self.download_stream_size: #If stream is active, process streamed sequence file data
-                self.download_stream_size = None
-                self.stream_download_timeout = None
-                if self.download_all_seq: #If all sequence are to be downloaded, request next sequence file for download
-                    seq_id = reply.pop(0) #Retrieve sequence file ID from list
-                    seq.bytesToSequence(reply, self.gui, self.seq_table_list[seq_id])
-                    if seq_id < seq.n_sequence_files-1:
-                        message.extend(struct.pack("B", seq_id+1))
-                        self.sendWithReply(self.prefix_dict["downloadSeqFile"], message)
-
-                    else:
-                        self.download_all_seq = False  #If end of sequence file list is reached, clear download all flag
-                        self.showDriverMessage()  # Start status update stream
-                        self.gui.splash.close()
-                        if self.initializing_connection:
-                            self.updateStatus() #Send GUI status to driver on successful connection
-                            self.initializing_connection = False
-                        else:
-                            self.gui.sync_update_signal.emit(None)  # Flag that the active sync state has changed
-                            self.showMessage("Sync and sequence files were successfully uploaded.")
-
-            elif len(reply) == 4: #If stream is not active, reply is stream initialization showing length of stream to be received
-                self.download_stream_size = struct.unpack("<L", reply)[0]
-                self.stream_download_timeout = time.time() + 0.5 + self.download_stream_size / 10000
-                self.sendWithReply(self.prefix_dict["downloadSeqFile"]) #Reply that ready for stream start
-            else:
-                self.showMessage("Error: Invalid downloadSeq packet received.")
+                led[2] = reply[2] > 0
+            self.sendWithoutReply(led)
 
         else:
-            if self.portConnected():
-                if widget:
-                    for index, ref_widget in enumerate(self.seq_table_list):
-                        if widget == ref_widget or widget == index: #Widget could be the calling widget object or a numerical index identifier
-                            message.extend(struct.pack("B", index))
-                            self.sendWithReply(self.prefix_dict["downloadSeqFile"], message)
-                else: #If no widget was specified, download the first sequence file
-                    message.extend(struct.pack("B", 0))
-                    self.download_all_seq = True #Flag that all sequence files are to be downloaded
-                    self.sendWithReply(self.prefix_dict["downloadSeqFile"], message)
-
-    def uploadSeqFile(self, reply=None, widget=None):
-        message = bytearray()
-        if reply is not None:
-            message.extend(struct.pack("B", self.prefix_dict["uploadSeqFile"]))
-            message.extend(reply)
-            self.upload_stream_buffer = seq.sequenceToBytes(self.gui, self.seq_table_list[ord(reply)])
-            message.extend(struct.pack("<L", len(self.upload_stream_buffer)))
-            if len(self.upload_stream_buffer) > 0: #If there is a file to stream, expect reply to start stream
-                self.sendWithReply(self.prefix_dict["uploadStream"], message, False)
-            else: #If no file is to be streamed, expect reply requesting next file
-                self.sendWithReply(self.prefix_dict["uploadSeqFile"], message, False)
-
-        else:
-            if self.portConnected():
-                for index, ref_widget in enumerate(self.seq_table_list):
-                    if widget == ref_widget or widget == index: #Widget could be the calling widget object or a numerical index identifier
-                        message.extend(struct.pack("B", index))
-                        self.sendWithReply(self.prefix_dict["uploadSeqFile"], message)
-
-    def uploadStream(self, message):
-        if self.portConnected():
-            self.sendWithoutReply(self.upload_stream_buffer, False)
-            self.upload_stream_buffer = []  # Clean stream buffer
-
-    def downloadStream(self, message):
-        pass
+            return
 
     def updateStatus(self, reply=None, force_tx = False):
-        unpack_string = "<"
-        # String for LED info
-        for byte in ["B", "H", "H"]:
-            for board_number in range(1, self.gui.nBoards() + 1):
-                unpack_string += byte
-
-        unpack_string += "B??"
-
-        # Temp and fan info
-        for byte in ["H", "H"]:
-            for _ in range(1, self.gui.nBoards() + 1): #https://www.datacamp.com/tutorial/role-underscore-python
-                unpack_string += byte
+        unpack_string = "<Bhh"
 
         if reply:
-            return##################################################################################################################################################
             #parse status
             status_change = False
             status_list = struct.unpack(unpack_string, reply)
+            index = 0
+            for key in ["Button", "Switch", "LED"]:
+                for side in ["Left", "Right"]:
+                    self.gui.controller_status_dynamic_dict[key][side] = (status_list[0] >> index) & 1
+                    if self.gui.controller_status_dynamic_dict[key][side] != self.gui.controller_status_dict[key][side]:
+                        self.gui.controller_status_dict[key][side] = self.gui.controller_status_dynamic_dict[key][side]
+                        if key != "LED":
+                            status_change = True
+                    index += 1
 
-            for index, key in enumerate(self.gui.status_dynamic_dict):
-                self.gui.status_dynamic_dict[key] = status_list[index]
-                if self.gui.status_dynamic_dict[key] != self.gui.status_dict[key]: #Update master dictionary if a value has changed
+            self.gui.controller_status_dynamic_dict["Built-in"] = (status_list[0] >> index) & 1
+            self.gui.controller_status_dict["Built-in"] = self.gui.controller_status_dynamic_dict["Built-in"]
 
-                   #Mouse autoclicker for Z-series
-                    if (self.autoclick_mouse and key == "Mode" and self.gui.status_dynamic_dict["Control"] and  self.gui.status_dynamic_dict["Mode"] == 0): #If the driver has control, and the mode switched to sync, get the mouse position
-                        self.autoclick_position = pyautogui.position()
-                        print("Autoclick position set: " + str(self.autoclick_position))
-                    if (self.autoclick_mouse and key == "State" and self.gui.status_dynamic_dict[key] == self.autoclick_state and self.gui.status_dynamic_dict["Mode"] == 0 and self.gui.status_dynamic_dict["Control"]): #If the sync status has changed to false, click the mouse
-                        print("Mouse autoclick")
-                        pyautogui.leftClick(self.autoclick_position)
+            index = 1
+            for side in ["Left", "Right"]:
+                self.gui.controller_status_dynamic_dict["Encoder"][side] += status_list[index]
+                index += 1
 
-                    self.gui.status_dict[key] = self.gui.status_dynamic_dict[key]
+                if self.gui.controller_status_dynamic_dict["Encoder"][side] != self.gui.controller_status_dict["Encoder"][side]:
+                    self.gui.controller_status_dict["Encoder"][side] = self.gui.controller_status_dynamic_dict["Encoder"][side]
                     status_change = True
 
             #If status has changed, emit status change signal with the new status dictionary
             if status_change:
-                self.gui.status_signal.emit(self.gui.status_dynamic_dict)
+                self.gui.controller_status_signal.emit(self.gui.controller_status_dict)
 
             # Send heartbeat packet in reply
             if (timer() - self.heartbeat_timer) > HEARTBEAT_INTERVAL:
                 self.showDriverMessage()
                 self.heartbeat_timer = timer()
         else:
-            if self.portConnected():
-                def widgetIndex(widget_list):
-                    nonlocal self
-                    for w_index, n_widget in enumerate(widget_list):
-                        if self.gui.getValue(n_widget) in [True, 1]:
-                            if(n_widget is self.gui.main_model["Mode"][0]): #if the slider has a value of 1 this means mode is 0
-                                w_index = 0
-                            return w_index
-                    else:
-                        #self.gui.showMessage("Error: Widget index not found!")
-                        return None
-                if widgetIndex(self.gui.main_model["Control"]) == 0 or force_tx: #Send a status control command only if GUI has control
-                    status_list = [0] * (5*self.gui.nBoards() + 3)
-                    led_dict = {"channel": [None]*self.gui.nBoards(), "pwm": [None]*self.gui.nBoards(), "current": [None]*self.gui.nBoards()}
-                    mode = widgetIndex(self.gui.main_model["Mode"])
-                    dial_max = self.gui.main_model["Intensity"].maximum()
-                    for board in range(1, self.gui.nBoards()+1):
-                        led_dict["channel"][board-1] = widgetIndex(self.gui.main_model["Channel"]["Board" + str(board)])
-                        if led_dict["channel"][board-1] is not None:
-                            led_number = led_dict["channel"][board-1]+1
-                            if mode == 1: #PWM mode
-                                led_dict["pwm"][board-1] = round((self.gui.getValue(self.gui.main_model["Intensity"]) / dial_max) * 65535)
-                                led_dict["current"][board-1] = round(self.gui.getAdcCurrentLimit(board, led_number)*655.35)
-                            elif mode == 2: #Current mode
-                                led_dict["pwm"][board - 1] = 65535
-                                led_dict["current"][board-1] = round((self.gui.getValue(self.gui.main_model["Intensity"]) / dial_max) * self.gui.getAdcCurrentLimit(board, led_number) * 655.35)
-                            else: #Off mode or sync mode
-                                led_dict["current"][board-1] = 0
-                                led_dict["pwm"][board-1] = 0
-                                led_dict["channel"][board - 1] = self.gui.nLeds()
-                        else:
-                            led_dict["channel"][board-1] = self.gui.nLeds()
-                            led_dict["current"][board-1] = 0
-                            led_dict["pwm"][board-1] = 0
-                    led_dict["channel"][board - 1]
-                    # Send only GUI states - set all driver specific values to 0 since they are just padding
-                    for board in range(0, self.gui.nBoards()):
-                        status_list[board] = led_dict["channel"][board]
-                        status_list[self.gui.nBoards() + board] = led_dict["pwm"][board]
-                        status_list[2*self.gui.nBoards() + board] = led_dict["current"][board]
-                    status_list[3*self.gui.nBoards()] = mode
-                    status_list[3*self.gui.nBoards()+2] = widgetIndex(self.gui.main_model["Control"])
-                    print(status_list)
-                    status_list = struct.pack("<BBBHHHHHHB??HHHHHH", *status_list)
-                    self.sendWithoutReply(status_list, True, 0)
-
-    def measurePeriod(self, reply=None):
-        if reply:
-            mirror_period = struct.unpack("<f", reply)[0]
-            self.gui.setValue(self.gui.sync_model["Confocal"]["Period"], mirror_period)
-        else:
-            if self.portConnected():
-                message = fileIO.syncToBytes(self.gui, self.prefix_dict["measurePeriod"])
-                self.sendWithoutReply(message, True, 100)  #Send temporary sync to be used to measure period
-
-    def testCurrent(self, reply=None):
-        if reply:
-            led_active = struct.unpack("<????", reply)
-            for index, led_state in enumerate(led_active):
-                self.gui.setValue(self.gui.config_model["LED" + str(index+1)]["Active"], led_state)
-        else:
-            if self.portConnected():
-                message = fileIO.configToBytes(self.gui, self.prefix_dict["testCurrent"])
-                self.sendWithoutReply(message, True, 100)
-
-    def testVolume(self, reply=None, indication_id=None):
-        def widgetIndex(widget_list):
-            nonlocal self
-            for w_index, n_widget in enumerate(widget_list):
-                if self.gui.getValue(n_widget):
-                    return w_index
-            else:
-                self.gui.showMessage("Error: Widget index not found!")
-                return None
-
-        if reply:
-            pass
-        else:
-            if self.portConnected() and indication_id is not None:
-                if indication_id == 0:
-                    volume = self.gui.getValue(self.gui.config_model["Audio"]["Status"])
-                    mode = 0
-                else:
-                    volume = self.gui.getValue(self.gui.config_model["Audio"]["Alarm"])
-                    mode = widgetIndex(self.gui.config_model["Pushbutton"]["Alarm"])
-                message = struct.pack("<BBB", *[indication_id, volume, mode])
-                self.sendWithoutReply(message, True, 10)  # Sent volume test command
+            return
 
     def portConnected(self):
         if self.active_port is None:
@@ -636,3 +460,22 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
         self.gui.stopSplash()
         self.gui.message_box.setText(text)
         self.gui.message_box.exec()
+
+    def controllerChanged(self, dict):
+        #Demo code that turns on the button LED when that button is pressed, and turns on the built-in LED when either encoder knob is pressed
+        leds = [0] * 3
+        toggle_leds = False
+        encoder_press = False
+        for index, side in enumerate(["Left", "Right"]):
+            leds[index] = self.gui.controller_status_dict["Button"][side] > 0
+            if leds[index] != self.gui.controller_status_dict["LED"][side]:
+                toggle_leds = True
+
+        if self.gui.controller_status_dict["Switch"]["Left"] > 0 or self.gui.controller_status_dict["Switch"]["Right"] > 0:
+            encoder_press = True
+            print(self.gui.controller_status_dict["Built-in"])
+        if encoder_press != self.gui.controller_status_dict["Built-in"]:
+            leds[2] = encoder_press
+            toggle_leds = True
+        if toggle_leds:
+            self.gui.controller.setLed(leds)
