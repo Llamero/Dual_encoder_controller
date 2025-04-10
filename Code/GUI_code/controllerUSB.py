@@ -380,7 +380,7 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
             pass
         else:
             if self.portConnected():
-                self.sendWithoutReply(fileIO.controllerConfigToBytes(self.gui, self.prefix_dict["uploadDriverConfiguration"]))
+                self.sendWithoutReply(fileIO.controllerConfigToBytes(self.gui))
 
     def setLed(self, reply=None):
         led = [0]*3
@@ -461,6 +461,8 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
         self.gui.message_box.setText(text)
         self.gui.message_box.exec()
 
+######################################################################################################################################################################################################################################
+
     def controllerChanged(self, dict):
         #Demo code that turns on the button LED when that button is pressed, and turns on the built-in LED when either encoder knob is pressed
         leds = [0] * 3
@@ -473,7 +475,6 @@ class usbSerial(QtWidgets.QWidget): #Implementation based on: https://stackoverf
 
         if self.gui.controller_status_dict["Switch"]["Left"] > 0 or self.gui.controller_status_dict["Switch"]["Right"] > 0:
             encoder_press = True
-            print(self.gui.controller_status_dict["Built-in"])
         if encoder_press != self.gui.controller_status_dict["Built-in"]:
             leds[2] = encoder_press
             toggle_leds = True

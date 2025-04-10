@@ -14,12 +14,12 @@ struct configurationStruct{ //65 bytes
 };
 
 const struct defaultConfigurationStruct{ //65 bytes
-  char controller_name[16] = "Unnamed driver "; //Name of LED driver: "default name"
+  char controller_name[16] = "Dual Encoder   "; //Name of LED driver: "default name"
   char encoder_name[2][16] = {"Left Encoder   ", "Right Encoder  "}; //Name of LED driver: "default name"
   float knob_rates[2][4] = {{1.01, 1.0001, 0, 0}, {1.01, 1.0001, 0, 0}}; //Different rates the knob gamma is applied as the knob turns
   uint8_t led_intensity[2] = {1, 255}; //Indicator LED intensity when off and on
   uint8_t update_interval = 10; //rate to send updates to GUI
-  uint8_t checksum = 253;
+  uint8_t checksum = 203;
 } defaultConfig;
 
 struct encoderStruct{
@@ -97,11 +97,11 @@ elapsedMillis update_timer;
 elapsedMillis heartbeat;
 
 void setup() {
+  //EEPROM.update(0,0); //Uncomment to reset EEPROM to defaults - re-comment and the upload code again
   Serial.begin(115200);
 
   //Load default structs
   memcpy(conf.byte_buffer, &defaultConfig, sizeof(conf.byte_buffer));
-  memcpy(encoder.byte_buffer, &defaultEncoder, sizeof(encoder.byte_buffer));
 
   //Set encoder pins
   for(i=18; i<24; i++) pinMode(i, INPUT_PULLUP);
@@ -142,6 +142,11 @@ void loop() {
       usb.update(); //Check if a command was received
     }
   }
+
+  //Flash LED when not connected
+  if(heartbeat < 500) digitalWriteFast(LED_BUILTIN, LOW);
+  else if(heartbeat > 1000) heartbeat = 0;
+  else digitalWriteFast(LED_BUILTIN, HIGH);
   usb.update(); //If serial is not active, monitor the usb connection
   delay(10);
 }
@@ -209,6 +214,12 @@ void checkEncoder(){
 }
 /////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL/////////////////SERIAL
 static void onPacketReceived(const uint8_t* buffer, size_t size){
+  //If there is not an active connection - initiazlize driver to know default state
+  if(!serial_connection_active){
+    digitalWriteFast(LED_BUILTIN, LOW);
+    memcpy(encoder.byte_buffer, &defaultEncoder, sizeof(encoder.byte_buffer));
+  }
+
   // Route decoded packet based on prefix byte
   heartbeat = 0; //Reset heartbeat timer as a serial packet has been received
   uint8_t buffer_prefix = buffer[0];
@@ -263,11 +274,9 @@ static void recvConfiguration(const uint8_t* buffer, size_t size){
   uint8_t checksum = 0;
   temp_size = 0;
   if(size == sizeof(conf.byte_buffer)+1){
-    for(int a = 0; a<(int) size-1; a++) checksum += buffer[a];
+    for(int a = 1; a<(int) size; a++) checksum += buffer[a];
     if(!checksum){
-      memcpy(conf.byte_buffer, buffer, sizeof(conf.byte_buffer));
-      conf.byte_buffer[0] = prefix.send_config; //Switch prefix to sending prefix
-      conf.byte_buffer[size-1] += (prefix.recv_config - prefix.send_config); //Fix corresponding checksum
+      memcpy(conf.byte_buffer, buffer+1, sizeof(conf.byte_buffer));
       for(int a = 0; a<(int) size; a++) EEPROM.update(a + sizeof(MAGIC_RECEIVE), conf.byte_buffer[a]); //Copy configuration to EEPROM
       initializeConfigurations(); //Re-run the setup routine to update driver state
       temp_size = sprintf(temp_buffer, "-Configuration file was successfully uploaded.\nAlso upload \"Sync\" settings to apply changes.");
@@ -309,6 +318,13 @@ static void disconnect(){
   temp_buffer[0] = prefix.disconnect; //Send disconnect command
   usb.send((const unsigned char*) temp_buffer, 1);
   serial_connection_active = false; //Stop sending status packets
+
+  analogWrite(pin_led[0], 0);
+  analogWrite(pin_led[1], 0);
+  digitalWriteFast(LED_BUILTIN, 0);
+  
+  //Reset encoder status
+  memcpy(encoder.byte_buffer, &defaultEncoder, sizeof(encoder.byte_buffer));
 }
 
 //////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM//////////////EEPROM
@@ -344,6 +360,11 @@ void initializeConfigurations(){
     else loadDefaultsToEEPROM();
   }
   else loadDefaultsToEEPROM();
+
+  //Update LEDs
+  analogWrite(pin_led[0], conf.c.led_intensity[encoder.e.command & B00010000]);
+  analogWrite(pin_led[1], conf.c.led_intensity[encoder.e.command & B00100000]);
+  digitalWriteFast(LED_BUILTIN, encoder.e.command & B01000000);
 }
 
 //https://forum.arduino.cc/index.php?topic=42850.0

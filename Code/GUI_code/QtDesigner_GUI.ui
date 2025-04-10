@@ -44,7 +44,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="main_tab">
        <property name="toolTip">
@@ -1517,11 +1517,11 @@
                          <property name="columnCount">
                           <number>4</number>
                          </property>
-                         <attribute name="verticalHeaderDefaultSectionSize">
-                          <number>25</number>
-                         </attribute>
                          <attribute name="verticalHeaderMinimumSectionSize">
                           <number>23</number>
+                         </attribute>
+                         <attribute name="verticalHeaderDefaultSectionSize">
+                          <number>25</number>
                          </attribute>
                          <row/>
                          <row/>
@@ -3404,11 +3404,14 @@ This input is clamped to 0-3.3V, and is rated for -3V to +6V max. A small negati
                   <property name="title">
                    <string>LED Intensity</string>
                   </property>
-                  <layout class="QGridLayout" name="gridLayout_58" columnstretch="0,0,0">
+                  <layout class="QGridLayout" name="gridLayout_58" columnstretch="0,0">
                    <item row="1" column="1">
                     <widget class="QSlider" name="sync_controller_led_on_slider">
                      <property name="maximum">
                       <number>250</number>
+                     </property>
+                     <property name="pageStep">
+                      <number>1</number>
                      </property>
                      <property name="value">
                       <number>250</number>
@@ -3442,6 +3445,9 @@ This input is clamped to 0-3.3V, and is rated for -3V to +6V max. A small negati
                     <widget class="QSlider" name="sync_controller_led_off_slider">
                      <property name="maximum">
                       <number>250</number>
+                     </property>
+                     <property name="pageStep">
+                      <number>1</number>
                      </property>
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
@@ -3489,7 +3495,7 @@ This input is clamped to 0-3.3V, and is rated for -3V to +6V max. A small negati
                      <row/>
                      <column>
                       <property name="text">
-                       <string>Left Exponent</string>
+                       <string>1</string>
                       </property>
                       <property name="toolTip">
                        <string>The LED channel # for each step.</string>
@@ -3502,7 +3508,7 @@ This input is clamped to 0-3.3V, and is rated for -3V to +6V max. A small negati
                      </column>
                      <column>
                       <property name="text">
-                       <string>Right Exponent</string>
+                       <string>2</string>
                       </property>
                      </column>
                     </widget>
@@ -5147,22 +5153,22 @@ This input is clamped to 0-3.3V, and is rated for -3V to +6V max. A small negati
  </designerdata>
  <buttongroups>
   <buttongroup name="sync_confocal_scan_mode_button_group"/>
-  <buttongroup name="sync_confocal_standby_LED_channel_button_group"/>
-  <buttongroup name="main_channel_button_group"/>
-  <buttongroup name="sync_confocal_scanning_LED_channel_button_group"/>
+  <buttongroup name="sync_confocal_line_analog_polarity_button_group"/>
   <buttongroup name="sync_digital_trigger_high_channel_button_group"/>
+  <buttongroup name="main_intensity_button_group"/>
+  <buttongroup name="sync_analog_board1_channel_button_group"/>
+  <buttongroup name="sync_confocal_shutter_polarity_button_group"/>
+  <buttongroup name="sync_confocal_line_digital_polarity_button_group"/>
+  <buttongroup name="sync_confocal_standby_LED_channel_button_group"/>
+  <buttongroup name="main_toggle_control_group"/>
+  <buttongroup name="configure_pushbutton_LED_button_group"/>
+  <buttongroup name="sync_confocal_scanning_LED_channel_button_group"/>
+  <buttongroup name="sync_digital_trigger_button_group"/>
+  <buttongroup name="main_channel_button_group"/>
+  <buttongroup name="sync_analog_board2_channel_button_group"/>
+  <buttongroup name="sync_digital_trigger_low_channel_button_group"/>
+  <buttongroup name="configure_indication_group"/>
   <buttongroup name="sync_analog_board3_channel_button_group"/>
   <buttongroup name="sync_confocal_line_input_button_group"/>
-  <buttongroup name="configure_pushbutton_LED_button_group"/>
-  <buttongroup name="configure_indication_group"/>
-  <buttongroup name="sync_analog_board1_channel_button_group"/>
-  <buttongroup name="sync_analog_board2_channel_button_group"/>
-  <buttongroup name="sync_confocal_line_digital_polarity_button_group"/>
-  <buttongroup name="main_intensity_button_group"/>
-  <buttongroup name="sync_confocal_line_analog_polarity_button_group"/>
-  <buttongroup name="sync_digital_trigger_button_group"/>
-  <buttongroup name="main_toggle_control_group"/>
-  <buttongroup name="sync_digital_trigger_low_channel_button_group"/>
-  <buttongroup name="sync_confocal_shutter_polarity_button_group"/>
  </buttongroups>
 </ui>

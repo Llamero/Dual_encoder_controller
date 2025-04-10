@@ -296,12 +296,17 @@ class statusWindow(QtWidgets.QWidget):
             for side in ["Left", "Right"]:
                 value = self.gui.controller_status_dict[key][side] > 0
                 widget = eval("self.controller_" + side.lower() + "_" + key.lower() + "_button")
+                widget.setStyleSheet("background-color: lightgreen; color: black;" if value else "background-color: lightGray; color: black;")
                 widget.setChecked(value)
+        self.controller_builtin_led_button.setStyleSheet("background-color: lightgreen; color: black;" if self.gui.controller_status_dict["Built-in"] else "background-color: lightGray; color: black;")
+        self.controller_builtin_led_button.setChecked(self.gui.controller_status_dict["Built-in"])
         for side in ["Left", "Right"]:
             value = self.gui.controller_status_dict["Encoder"][side]%256
             widget = eval("self.controller_" + side.lower() + "_dial")
             widget.setValue(value)
-
+        self.text_controller_name_label.setText("Name: " + self.gui.controller_status_dict["Name"])
+        self.text_controller_serial_label.setText("Serial: " + self.gui.controller_status_dict["Serial"])
+        self.text_controller_com_port_label.setText("COM Port: " + self.gui.controller_status_dict["COM Port"])
 
     def updateLabel(self, key, value, unit = ""):
         prefix = key

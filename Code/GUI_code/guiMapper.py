@@ -277,8 +277,8 @@ def initializeEvents(gui):
         gui.sync_confocal_scan_unidirectional_button.toggled.connect(lambda: gui.toggleScanMode())
         gui.sync_confocal_scan_period_button.clicked.connect(lambda: gui.ser.measurePeriod())
 
-        gui.sync_controller_download_button.clicked.connect(lambda: gui.ser.downloadControllerConfiguration())
-        gui.sync_controller_upload_button.clicked.connect(lambda: gui.ser.uploadControllerConfiguration())
+        gui.sync_controller_download_button.clicked.connect(lambda: gui.controller.downloadDriverConfiguration())
+        gui.sync_controller_upload_button.clicked.connect(lambda: gui.controller.uploadDriverConfiguration())
 
         gui.sync_download_button.clicked.connect(lambda: gui.ser.downloadSyncConfiguration())
         gui.sync_upload_button.clicked.connect(lambda: gui.ser.uploadSyncConfiguration())

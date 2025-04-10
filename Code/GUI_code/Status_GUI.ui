@@ -573,6 +573,154 @@
        <string>Controller</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_22">
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="controller_left_box">
+         <property name="title">
+          <string>Left Controller</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_20" rowstretch="10,0,0,0,0">
+          <item row="2" column="0">
+           <widget class="QPushButton" name="controller_left_button_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Pushbutton</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="controller_left_switch_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Encoder Switch</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QDial" name="controller_left_dial">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximum">
+             <number>255</number>
+            </property>
+            <property name="wrapping">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="Line" name="controller_left_line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QPushButton" name="controller_left_led_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>LED</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QGroupBox" name="controller_right_box">
+         <property name="title">
+          <string>Right Controller</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_21" rowstretch="10,0,0,0,0">
+          <item row="0" column="0">
+           <widget class="QDial" name="controller_right_dial">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximum">
+             <number>255</number>
+            </property>
+            <property name="wrapping">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="Line" name="controller_right_line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="controller_right_switch_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Encoder Switch</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="controller_right_button_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Pushbutton</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QPushButton" name="controller_right_led_button">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>LED</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item row="0" column="0" colspan="2">
         <widget class="QGroupBox" name="text_controller_connection_box">
          <property name="font">
@@ -662,161 +810,23 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="controller_left_box">
-         <property name="title">
-          <string>Left Controller</string>
+       <item row="2" column="0" colspan="2">
+        <widget class="QPushButton" name="controller_builtin_led_button">
+         <property name="enabled">
+          <bool>false</bool>
          </property>
-         <layout class="QGridLayout" name="gridLayout_20" rowstretch="10,0,0,0,0">
-          <item row="0" column="0">
-           <widget class="QDial" name="controller_left_dial">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="maximum">
-             <number>255</number>
-            </property>
-            <property name="wrapping">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QRadioButton" name="controller_left_switch_button">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>Encoder Switch</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="autoExclusive">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QRadioButton" name="controller_left_button_button">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>Pushbutton</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="autoExclusive">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="Line" name="controller_left_line">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QRadioButton" name="controller_left_led_button">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>LED</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="autoExclusive">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QGroupBox" name="controller_right_box">
-         <property name="title">
-          <string>Right Controller</string>
+         <property name="text">
+          <string>Built-in LED</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_21" rowstretch="10,0,0,0,0">
-          <item row="0" column="0">
-           <widget class="QDial" name="controller_right_dial">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="maximum">
-             <number>255</number>
-            </property>
-            <property name="wrapping">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QRadioButton" name="controller_right_switch_button">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>Encoder Switch</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-            <property name="autoExclusive">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QRadioButton" name="controller_right_button_button">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>Pushbutton</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="autoExclusive">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="Line" name="controller_right_line">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QRadioButton" name="controller_right_led_button">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>LED</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="autoExclusive">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -1017,7 +1027,7 @@
          <string>1 Hz</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -1028,6 +1038,9 @@
         </property>
         <property name="text">
          <string>Custom:</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
